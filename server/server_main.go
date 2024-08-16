@@ -2,21 +2,30 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	serverhandlers "github.com/prachin77/server/ServerHandlers"
 )
 
 func main() {
-	r := mux.NewRouter()
+	// Set Gin to release mode
+	gin.SetMode(gin.ReleaseMode)
 
-	fmt.Println("listening to port :8080")
+	// Create a new Gin engine without the default middleware
+	r := gin.New()
 
-	r.HandleFunc("/register",serverhandlers.Register).Methods("POST")
-	r.HandleFunc("/login",serverhandlers.Login).Methods("POST")
-	r.HandleFunc("/login",serverhandlers.Logout).Methods("DELETE")
+	// Add Logger and Recovery middleware
+	r.Use(gin.Logger(), gin.Recovery())
 
-	log.Fatal(http.ListenAndServe(":8080" ,	 r))
+	r.MaxMultipartMemory = 8 << 20 // 8 MiB
+
+	// AUTH URLs 
+	r.POST("/register", serverhandlers.Register)
+	r.POST("/login",serverhandlers.Login)
+
+	// start server
+	err := r.Run(":8080")
+	if err != nil {
+		fmt.Println(err)
+	}
 }

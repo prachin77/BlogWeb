@@ -1,3 +1,5 @@
 1. server should be robust & compatible for any language
 2. server should only send data nothing else
 
+server
+mux -> gin

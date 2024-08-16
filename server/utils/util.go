@@ -74,6 +74,7 @@ func GetCookie(w http.ResponseWriter, r *http.Request) (string, string) {
 	}
 
 	tokenString := cookie.Value
+	fmt.Println("token string from getcookie func = ",tokenString)
 
 	// Decode JWT token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -101,4 +102,13 @@ func GetCookie(w http.ResponseWriter, r *http.Request) (string, string) {
 		log.Println("Invalid token")
 		return "", ""
 	}
+}
+
+func DeleteCookie(w http.ResponseWriter, r *http.Request){
+	cookie := &http.Cookie{
+		Name : "SessionToken",
+		Value: "",
+		MaxAge: -1,
+	}
+	http.SetCookie(w,cookie)
 }

@@ -7,6 +7,7 @@ type User struct {
 	UserId   string `json:"userid"`
 }
 
+// for client side 
 type AuthPageStatus struct {
     IsLogin bool
 }

@@ -68,3 +68,14 @@ func InsertUser(user *models.User) (error, models.User) {
 	return nil, *user
 }
 
+func IsTokenPresentInDb(tokenString string) (bool, error) {
+    query := "SELECT COUNT(*) FROM users WHERE userid = ?"
+    var count int
+    err := db.QueryRow(query, tokenString).Scan(&count)
+    if err != nil {
+        return false, err
+    }
+    return count > 0, nil
+}
+
+

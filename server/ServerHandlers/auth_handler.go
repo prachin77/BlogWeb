@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/prachin77/db"
 	"github.com/prachin77/server/models"
 	"github.com/prachin77/server/utils"
@@ -14,7 +15,7 @@ import (
 var resp = make(map[string]string)
 var respInterface = make(map[string]interface{})
 
-func Register(w http.ResponseWriter, r *http.Request) {
+func Register(ctx *gin.Context) {
 
 	// 1. user registers
 	// 2. check whether user with same email & password is already present in db
@@ -22,21 +23,21 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// 4. if no , then store user details in db
 	// 5. set cookies for user in browser
 
-	w.Header().Set("content-Type", "application/json")
+	ctx.Header("content-Type", "application/json")
 
 	var user models.User
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(ctx.Request.Body).Decode(&user)
 	if err != nil {
 		resp["message"] = "data not in correct format"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
 	if user.UserName == "" || user.Email == "" || user.Password == "" {
 		resp["message"] = "any of the fields should not be empty"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
@@ -45,21 +46,37 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if userFound == true {
 		resp["message"] = "user found in db !"
 		fmt.Println("user found in db !")
-		w.WriteHeader(http.StatusConflict)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusConflict)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
-	// Generate Token 
 	tokenString := utils.TokenGenerator()
-	user.UserId = tokenString		
 
-	err , insertedUser := db.InsertUser(&user)
-	if err != nil{
+	// Checking whether the generated session token is already used or not
+	// If so then generate another session token & keep this loop until we find a unique session token
+	for {
+		isTokenFound , err := db.IsTokenPresentInDb(tokenString)
+		if err != nil{
+			fmt.Println(err)
+			resp["message"] = "cant validate session token"
+			json.NewEncoder(ctx.Writer).Encode(resp)
+		}
+		if !isTokenFound{
+			break
+		}
+		tokenString = utils.TokenGenerator()
+		fmt.Println("new session token : ",tokenString)
+	}
+
+	user.UserId = tokenString
+
+	err, insertedUser := db.InsertUser(&user)
+	if err != nil {
 		resp["message"] = "error inserting data"
 		fmt.Println("error inserting data")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
@@ -70,11 +87,11 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		"message": "registration successful",
 		"user":    insertedUser,
 	}
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(respInterface)
+	ctx.Writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(ctx.Writer).Encode(respInterface)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
+func Login(ctx *gin.Context) {
 
 	// 1. user login
 	// 2. check user existence through unique password & unique email from DB
@@ -82,50 +99,47 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// 4. else give error message & return
 	// 5. after token generation create cookie and store its value in browser
 
-	w.Header().Set("content-Type", "application/json")
+	ctx.Header("content-Type", "application/json")
 
 	var user models.User
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if err != nil{
+	err := json.NewDecoder(ctx.Request.Body).Decode(&user)
+	if err != nil {
 		resp["message"] = "data not in correct format"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
 	// check for empty data
-	if user.Email == "" || user.Password == ""{
+	if user.Email == "" || user.Password == "" {
 		resp["message"] = "email and password can't be empty"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(ctx.Writer).Encode(resp)
 		return
 	}
 
-	tokenString := utils.TokenGenerator()
-	user.UserId = tokenString
 
-	// check through email & pasword if user found  in db or not 
-	userFound , storedUser := db.CheckUserInDB(&user)
-	if !userFound{
+	// check through email & pasword if user found  in db or not
+	userFound, storedUser := db.CheckUserInDB(&user)
+	if !userFound {
 		resp["message"] = "message no user found in db"
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(resp)
-		return 
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(ctx.Writer).Encode(resp)
+		return
 	}
 
-
 	fmt.Println("login sucessfull")
-	fmt.Println("login user details = ",storedUser)
+	fmt.Println("login user details = ", storedUser)
 
 	respInterface = map[string]interface{}{
-		"message": "registration successful",
+		"message": "Login successful",
 		"user":    storedUser,
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(respInterface)
+	ctx.Writer.WriteHeader(http.StatusOK)
+	json.NewEncoder(ctx.Writer).Encode(respInterface)
 }
 
-func Logout(w http.ResponseWriter, r *http.Request){
-	
+func Logout(w http.ResponseWriter, r *http.Request) {
+
 }
