@@ -139,7 +139,3 @@ func Login(ctx *gin.Context) {
 	ctx.Writer.WriteHeader(http.StatusOK)
 	json.NewEncoder(ctx.Writer).Encode(respInterface)
 }
-
-func Logout(w http.ResponseWriter, r *http.Request) {
-
-}

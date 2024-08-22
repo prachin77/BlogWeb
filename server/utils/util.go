@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/prachin77/server/models"
 )
@@ -44,7 +45,7 @@ func CreateJwtToken(loggedInUserValue *models.User) (string, error) {
 }
 
 
-func SetCookie(w http.ResponseWriter, r *http.Request, loggedInUserValue *models.User) {
+func SetCookie(ctx *gin.Context, loggedInUserValue *models.User) {
 	tokenString , err := CreateJwtToken(loggedInUserValue)
 	if err!=nil{
 		fmt.Println("failed to generate token")
@@ -59,12 +60,11 @@ func SetCookie(w http.ResponseWriter, r *http.Request, loggedInUserValue *models
 		HttpOnly: true,
 		Secure:   true,
 	}
-	http.SetCookie(w, &cookie)
+	http.SetCookie(ctx.Writer, &cookie)
 }
 
-func GetCookie(w http.ResponseWriter, r *http.Request) (string, string) {
-	cookie, err := r.Cookie("SessionToken")
-
+func GetCookie(ctx *gin.Context) (string, string) {
+	cookie, err := ctx.Request.Cookie("SessionToken")
 	if err == http.ErrNoCookie {
 		return "", ""
 	} else if err != nil {
@@ -104,11 +104,11 @@ func GetCookie(w http.ResponseWriter, r *http.Request) (string, string) {
 	}
 }
 
-func DeleteCookie(w http.ResponseWriter, r *http.Request){
+func DeleteCookie(ctx *gin.Context){
 	cookie := &http.Cookie{
 		Name : "SessionToken",
 		Value: "",
 		MaxAge: -1,
 	}
-	http.SetCookie(w,cookie)
+	http.SetCookie(ctx.Writer,cookie)
 }
