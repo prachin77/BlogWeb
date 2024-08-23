@@ -1,3 +1,132 @@
-<div id="main-auth-div">
-
+<!DOCTYPE html>
+<div id="main-auth-div" class="max-w-md w-full mx-auto bg-white p-8 rounded-lg shadow-md">
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    {{ if .IsLogin }}
+        <form hx-post="/login"
+              hx-target="#main-auth-div"
+              hx-swap="outerHTML"
+              hx-ext="json-enc"
+              class="space-y-6"
+        >
+            <div class="mb-4 relative">
+                <img src="/static/images/email.png" class="absolute top-2 left-2 w-4 h-4">
+                <input type="email"
+                       id="email"
+                       name="email"
+                       placeholder="email"
+                       required
+                       class="block w-full pl-10 p-2 mt-1 text-sm text-gray-700 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mb-4 relative">
+                <img src="/static/images/hide.png" class="absolute top-2 left-2 w-4 h-4 cursor-pointer"
+                     onclick="document.getElementById('password').getAttribute('type') == 'password' ? document.getElementById('password').setAttribute('type','text') : document.getElementById('password').setAttribute('type','password'); this.src = this.src.includes('hide.png') ? '/static/images/show.png' : '/static/images/hide.png';">
+                <input type="password"
+                       id="password"
+                       name="password"
+                       placeholder="password"
+                       required
+                       class="block w-full pl-10 p-2 mt-1 text-sm text-gray-700 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mb-4">
+                <input type="submit"
+                       value="login"
+                       id="loginbutton"
+                       class="w-full px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mt-4 flex justify-center">
+                <button class="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:ring-gray-300 focus:border-gray-300">
+                    <img src="/static/images/google.png" class="w-4 h-4 mr-2">
+                    Google Login
+                </button>
+            </div>
+            <div class="text-sm text-gray-500">
+                <a  class="text-blue-500 hover:text-blue-700 hover:cursor-pointer"
+                    hx-get="/register"
+                    hx-push-url="/register"
+                    hx-target="#main-auth-div"
+                    hx-swap="outerHTML"
+                >   
+                    Don't have an account? Register
+                </a>
+            </div>
+        </form>
+    {{ else }}
+        <form hx-post="/register"
+              hx-target="#main-auth-div"
+              hx-swap="outerHTML"
+              hx-ext="json-enc"
+              class="space-y-6"
+        >
+            <div class="mb-4 relative">
+                <img src="/static/images/user.png" class="absolute top-2 left-2 w-4 h-4">
+                <input type="text"
+                       id="username"
+                       name="username"
+                       placeholder="username"
+                       required
+                       class="block w-full pl-10 p-2 mt-1 text-sm text-gray-700 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mb-4 relative">
+                <img src="/static/images/email.png" class="absolute top-2 left-2 w-4 h-4">
+                <input type="email"
+                       id="email"
+                       name="email"
+                       placeholder="email"
+                       required
+                       class="block w-full pl-10 p-2 mt-1 text-sm text-gray-700 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mb-4 relative">
+                <img src="/static/images/hide.png" class="absolute top-2 left-2 w-4 h-4 cursor-pointer h-8 w-8"
+                     onclick="document.getElementById('password')
+                              .getAttribute('type') == 'password' 
+                              ? document.getElementById('password')
+                              .setAttribute('type','text') : document
+                              .getElementById('password').setAttribute('type','password'); 
+                                    this.src = this.src.includes('hide.png') 
+                              ? '/static/images/show.png' 
+                              : '/static/images/hide.png';"
+                >
+                <input type="password"
+                       id="password"
+                       name="password"
+                       placeholder="password"
+                       required
+                       class="block w-full pl-10 p-2 mt-1 text-sm text-gray-700 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="mb-4">
+                <input type="submit"
+                       value="register"
+                       id="registerbutton"
+                       class="w-full px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:ring-blue-500 focus:border-blue-500"
+                >
+            </div>
+            <div class="text-sm text-gray-500">
+                <a  class="text-blue-500 hover:text-blue-700 hover:cursor-pointer"
+                    hx-get="/login"
+                    hx-push-url="/login"
+                    hx-target="#main-auth-div"
+                    hx-swap="outerHTML"
+                >
+                    Already have an account? Login
+                </a>
+            </div>
+            <div class="mt-4 flex justify-center">
+                <button class="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus:ring-gray-300 focus:border-gray-300">
+                    <img src="/static/images/google.png" class="w-4 h-4 mr-2">
+                    Google Register
+                </button>
+            </div>
+        </form>
+    {{ end }}
 </div>
