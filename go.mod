@@ -1,10 +1,13 @@
 module github.com/prachin77
 
-go 1.22.1
+go 1.23
+
+toolchain go1.23.0
 
 require github.com/go-sql-driver/mysql v1.8.1
 
 require (
+	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/air-verse/air v1.52.3 // indirect
 	github.com/bep/godartsass v1.2.0 // indirect
@@ -27,9 +30,12 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/gohugoio/hugo v0.132.2 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
+	github.com/gorilla/sessions v1.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/markbates/goth v1.80.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/hashstructure v1.1.0 // indirect
@@ -56,4 +62,5 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/joho/godotenv v1.5.1
+	golang.org/x/oauth2 v0.22.0
 )
