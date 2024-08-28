@@ -83,48 +83,31 @@ func getGithubClientSecret() string {
 	return githubClientSecret
 }
 
-// func GithubLoginHandler(w http.ResponseWriter, r *http.Request) {
-// 	// Get the environment variable
-// 	githubClientID := getGithubClientID()
-
-// 	// Create the dynamic redirect URL for login
-// 	redirectURL := fmt.Sprintf(
-// 		"https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
-// 		githubClientID,
-// 		"http://localhost:3456/login/github/callback",
-// 	)
-
-// 	http.Redirect(w, r, redirectURL, 301)
-// }
 func GithubLoginHandler(w http.ResponseWriter, r *http.Request) {
-    githubClientID := getGithubClientID()
-    redirectURL := fmt.Sprintf(
-        "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
-        githubClientID,
-        "http://localhost:3456/login/github/callback",
-    )
-    fmt.Println("Redirecting to:", redirectURL) // Logging redirect URL
-    http.Redirect(w, r, redirectURL, 301)
+	// Get the environment variable
+	githubClientID := getGithubClientID()
+
+	// Create the dynamic redirect URL for login
+	redirectURL := fmt.Sprintf(
+		// "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s",
+		// githubClientID,
+		// "http://localhost:3456/login/github/callback",
+		"https://github.com/login/oauth/authorize?client_id=Ov23ligYPbXWb2ei99a6&redirect_uri=http://localhost:3456/login/github/callback",
+	)
+	fmt.Println(githubClientID)
+	http.Redirect(w, r, redirectURL, 301)
 }
-
-// func GithubCallbackHandler(w http.ResponseWriter, r *http.Request) {
-// 	code := r.URL.Query().Get("code")
-
-// 	githubAccessToken := getGithubAccessToken(code)
-
-// 	githubData := getGithubData(githubAccessToken)
-
-// 	LoggedinHandler(w, r, githubData)
-// }
 
 func GithubCallbackHandler(w http.ResponseWriter, r *http.Request) {
-    code := r.URL.Query().Get("code")
-    fmt.Println("Authorization Code:", code) // Logging the received code
-    githubAccessToken := getGithubAccessToken(code)
-    fmt.Println("Access Token:", githubAccessToken) // Logging the access token
-    githubData := getGithubData(githubAccessToken)
-    LoggedinHandler(w, r, githubData)
+	code := r.URL.Query().Get("code")
+
+	githubAccessToken := getGithubAccessToken(code)
+
+	githubData := getGithubData(githubAccessToken)
+
+	LoggedinHandler(w, r, githubData)
 }
+
 
 func getGithubAccessToken(code string) string {
 
