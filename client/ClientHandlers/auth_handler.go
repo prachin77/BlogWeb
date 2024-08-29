@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prachin77/db"
@@ -109,4 +110,13 @@ func Register(ctx *gin.Context) {
 	fmt.Println("Inserted user details: ", insertedUser)
 	ctx.Writer.WriteHeader(http.StatusOK)
 	RenderHomePage(ctx,user.UserId)
+}
+
+func Logout(ctx *gin.Context){
+	ctx.Header("content-Type","text/html")
+
+	utils.DeleteCookie(ctx)
+	time.Sleep(5 * time.Second)
+	RenderLoginPage(ctx)
+	ctx.Writer.WriteHeader(http.StatusOK)
 }

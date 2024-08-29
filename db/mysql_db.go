@@ -78,4 +78,20 @@ func IsTokenPresentInDb(tokenString string) (bool, error) {
     return count > 0, nil
 }
 
+func SearchUserWithId(userid string) (models.User,error) {
+	query := "SELECT * FROM users WHERE userid = ?"
 
+	row := db.QueryRow(query, userid)
+
+	var storedUser models.User	
+
+	err := row.Scan(&storedUser.UserName , &storedUser.Email , &storedUser.Password , &storedUser.UserId)
+	if err != nil{
+		if err == sql.ErrNoRows{
+			return models.User{} , nil
+		}
+		return models.User{} ,  nil
+	}
+
+	return storedUser , nil
+}

@@ -1,7 +1,7 @@
-<div id="homepage-div" class="flex justify-center">
+<div id="homepage-div" class="flex flex-col h-screen w-full">
+
     <script src="https://unpkg.com/htmx.org@1.9.11"
-        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
-        crossorigin="anonymous">
+    integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0" crossorigin="anonymous">
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
@@ -13,6 +13,54 @@
     <!-- <script>
         CKEDITOR.replace( 'content' );
     </script> -->
-    
-    home
+
+    <!-- NAVBAR --> 
+    <nav class="bg-gray-800 w-full h-16 flex items-center">
+        <div class="mx-auto px-2 sm:px-6 lg:px-8 flex items-center justify-between w-full">
+            <div class="flex items-center">
+                <img src="/static/images/blogger.png" 
+                     alt="blogger" 
+                     class="h-8 w-8"
+                >
+                <div class="hidden sm:flex sm:ml-6">
+                    <div class="flex space-x-4">
+                        <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Dashboard</a>
+                        <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
+                        <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
+                        <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative flex items-center space-x-4">
+                    <button type="button" 
+                            id="profile-button" 
+                            class="flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    >
+                        <img class="h-8 w-8 rounded-full" 
+                             src="/static/images/user.png" 
+                             alt="User Profile"
+                        >
+                        <div class="ml-2 hidden sm:flex items-center">
+                            <p class="text-white text-sm">{{ .UserName }}</p>
+                        </div>
+                    </button>
+                    <button id="logout-button" 
+                            hx-delete="/logout"
+                            hx-target="#homepage-div"
+                            hx-swap="outerHTML"
+                            hx-push-url="/login"
+                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                    >
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content-div" class="flex-1 p-4 border-8 border-black">
+        <!-- Your blog content will go here -->
+    </div>
 </div>

@@ -3,11 +3,12 @@ package clienthandlers
 import (
 	"fmt"
 	"html/template"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prachin77/db"
 	"github.com/prachin77/server/models"
 	"github.com/prachin77/server/utils"
-	// "github.com/prachin77/server/utils"
 )
 
 var (
@@ -35,18 +36,27 @@ func RenderInitPage(ctx *gin.Context) {
 	}
 	fmt.Println("cookie token string = ", tokenString)
 	fmt.Println("userid from cookie = ", userid)
-	RenderHomePage(ctx,userid)
+	RenderHomePage(ctx, userid)
 }
 
-func RenderHomePage(ctx *gin.Context , userid string) {
+func RenderHomePage(ctx *gin.Context, userid string) {
 	ctx.Header("content-Type", "text/html")
+
+	userDetails, err := db.SearchUserWithId(userid)
+	if err != nil {
+		fmt.Println("error fetching usser = ", err)
+		ctx.String(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	fmt.Println("user details from render home page = ", userDetails)
 
 	tmpl, err := template.ParseFiles(PATH + "homepage.html")
 	if err != nil {
 		fmt.Println("unable to render home page = ", err)
+		ctx.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	tmpl.Execute(ctx.Writer, userid)
+	tmpl.Execute(ctx.Writer, userDetails)
 }
 
 func RenderLoginPage(ctx *gin.Context) {

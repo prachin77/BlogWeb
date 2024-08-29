@@ -31,6 +31,7 @@ func main() {
 	r.GET("/login", clienthandlers.RenderLoginPage)
 	r.POST("/login", clienthandlers.Login)
 	r.POST("/register", clienthandlers.Register)
+	r.DELETE("/logout",clienthandlers.Logout)
 
 	// start server
 	err := r.Run(":1234")
