@@ -12,9 +12,10 @@
           hx-post="/post-blog"
           class="space-y-6"
           hx-ext="json-enc"
+          enctype="multipart/form-data"
           hx-target="#post-blog-div"
           hx-swap="outerHTML"
-          hx-trigger="submit[onValidate()]"
+          hx-trigger="submit"
     >
         <div>
             <label for="blogtitle" class="block text-lg font-semibold text-gray-800">Blog Title</label>
@@ -56,22 +57,81 @@
                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
         </div>
         <div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out">Post Blog</button>
+            <button type="submit"
+                    id="post-button" 
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            >
+                Post Blog
+            </button>
         </div>
     </form>
 
     <script>
-        function OnValidate(){
-            let blogTitle = document.getElementById("blogtitle")
-            let blogContent = document.getElementById("blogcontent")
-            let tags = document.getElementById("tags")
-
-            if (blogTitle == ""){
+        function OnValidate(event){
+            let blogTitle = document.getElementById("blogtitle");
+            let blogContent = CKEDITOR.instances.blogcontent.getData(); // Use CKEDITOR to get content
+            let tags = document.getElementById("tags");
+    
+            if (blogTitle.value.trim() === ""){
+                alert("Blog title can't be empty");
                 blogTitle.focus();
-                return false
+                event.preventDefault(); 
+                return false;
             }
+            if(blogTitle.value.length < 4 || blogTitle.value.length > 20){
+                alert("Title length should be between 4 to 20 characters");
+                blogTitle.focus();
+                event.preventDefault(); 
+                return false;
+            }
+            
+            if (blogContent.trim() === ""){
+                alert("Blog content can't be empty");
+                document.querySelector('#blogcontent').focus(); // CKEditor focus
+                event.preventDefault(); 
+                return false;
+            }
+            // Assuming you want to check content length
+            if(blogContent.length < 1 || blogContent.length > 100){
+                alert("Minimum 1 letter & max 100 letters");
+                document.querySelector('#blogcontent').focus(); // CKEditor focus
+                event.preventDefault();
+                return false;
+            }
+    
+            let blogImage = document.getElementById("blogimage");
+    
+            if (blogImage.files.length === 0){
+                alert("Please select an image 😒");
+                event.preventDefault();
+                return false;
+            }
+    
+            const maxImageSize = 2 * 1024 * 1024; // 2 MB
+            if(blogImage.files[0].size > maxImageSize){
+                alert("File size exceeds 2MB");
+                event.preventDefault(); 
+                return false;
+            }
+    
+            const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
+            if(!validImageTypes.includes(blogImage.files[0].type)){
+                alert("Invalid file type");
+                event.preventDefault(); 
+                return false;
+            }
+    
+            let postButton = document.getElementById("post-button");
+            postButton.innerText = "Posting ..."; // Update button text
+            return true;
         }
+    
+        // Attach the OnValidate function to form submit
+        document.getElementById('post-blog-form').addEventListener('submit', function(event) {
+            OnValidate(event);
+        });
     </script>
+    
 
 </div>
 

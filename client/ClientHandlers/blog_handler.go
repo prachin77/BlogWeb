@@ -20,4 +20,5 @@ func PostBlog(ctx *gin.Context) {
 		ctx.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	fmt.Println("blog details : ",blog)
 }

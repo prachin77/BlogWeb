@@ -56,7 +56,7 @@ func SetCookie(ctx *gin.Context, loggedInUserValue *models.User) {
 		Name:     "SessionToken",
 		Value:    tokenString,
 		Path:     "/",
-		MaxAge:   600,
+		MaxAge:   1800,
 		HttpOnly: true,
 		Secure:   true,
 	}
