@@ -33,6 +33,10 @@ func main() {
 	r.POST("/register", clienthandlers.Register)
 	r.DELETE("/logout",clienthandlers.Logout)
 
+	// BLOG URLs 
+	r.GET("/post-blog",clienthandlers.RenderPostBlogPage)
+	r.POST("/post-blog",clienthandlers.PostBlog)
+
 	// start server
 	err := r.Run(":1234")
 	if err != nil {

@@ -6,15 +6,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
 
-    <!-- ckeditor cdn - for fancy text editor  -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-
-    <!-- replace editor1 with name attribute of your textarea tag -->
-    <!-- <script>
-        CKEDITOR.replace( 'content' );
-    </script> -->
-
-    <!-- NAVBAR --> 
+    <!-- NAVBAR -->
     <nav class="bg-gray-800 w-full h-16 flex items-center">
         <div class="mx-auto px-2 sm:px-6 lg:px-8 flex items-center justify-between w-full">
             <div class="flex items-center">
@@ -61,6 +53,21 @@
 
     <!-- MAIN CONTENT -->
     <div id="main-content-div" class="flex-1 p-4 border-8 border-black">
-        <!-- Your blog content will go here -->
+        <div class="absolute bottom-20 right-20 group">
+            <button id="add-post-button" 
+                    hx-get="/post-blog"
+                    hx-target="#main-content-div"
+                    hx-swap="outerHTML"
+                    hx-push-url="/post-blog"
+                    class="relative bg-gray-800 p-1 rounded-full focus:outline-none"
+            >
+                <img src="/static/images/add.png" alt="add post" class="h-8 w-8">
+                <!-- Tooltip -->
+                <div class="absolute bottom-full right-1 mb-2 hidden group-hover:block bg-gray-700 text-white text-xs rounded py-1 px-2">
+                    Add Post
+                </div>
+            </button>
+        </div>
+        
     </div>
 </div>

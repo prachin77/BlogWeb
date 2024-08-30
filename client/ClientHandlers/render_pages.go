@@ -81,3 +81,30 @@ func RenderRegisterPage(ctx *gin.Context) {
 	tmpl := template.Must(template.ParseFiles(PATH + "auth_page.html"))
 	tmpl.Execute(ctx.Writer, authStatus)
 }
+
+func RenderPostBlogPage(ctx *gin.Context){
+	ctx.Header("content-Type" , "text/html")
+
+	tagsList := []string{
+		"Science",
+		"Sports",
+		"Politics",
+		"Climate",
+		"Technology",
+		"Health",
+		"Travel",
+		"Finance",
+		"Food",
+		"History",
+		"Art",
+		"Philosophy",
+		"Mythology",
+	}
+	data := map[string]interface{}{
+		"TagsList" : tagsList,
+	}
+
+	tmpl := template.Must(template.ParseFiles(PATH + "post_blog.html"))
+	tmpl.Execute(ctx.Writer,data)
+}
+

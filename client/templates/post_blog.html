@@ -1,0 +1,77 @@
+<div id="post-blog-div" class="p-6 bg-white rounded-lg shadow-lg max-w-3xl mx-auto mt-8">
+    <script src="https://unpkg.com/htmx.org@1.9.11"
+        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
+        crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+    <!-- ckeditor cdn - for fancy text editor  -->
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    
+    <form id="post-blog-form" 
+          hx-post="/post-blog"
+          class="space-y-6"
+          hx-ext="json-enc"
+          hx-target="#post-blog-div"
+          hx-swap="outerHTML"
+          hx-trigger="submit[onValidate()]"
+    >
+        <div>
+            <label for="blogtitle" class="block text-lg font-semibold text-gray-800">Blog Title</label>
+            <input type="text"
+                   name="blogtitle"
+                   id="blogtitle"
+                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                   autocomplete="off"
+                   placeholder="Enter title">
+        </div>
+        <div>
+            <label for="blogcontent" class="block text-lg font-semibold text-gray-800">Blog Content</label>
+            <textarea name="blogcontent"
+                      id="blogcontent"
+                      class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      rows="6"
+                      placeholder="Enter content"
+            >
+            </textarea>
+            <!-- Replace editor1 with name attribute of your textarea tag -->
+            <script>
+                CKEDITOR.replace('blogcontent');
+            </script>
+        </div>
+        <div>
+            <label for="tags" class="block text-lg font-semibold text-gray-800">Tags</label>
+            <select name="tags" id="tags" multiple class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                {{range .TagsList}}
+                <option value="{{.}}">{{.}}</option>
+                {{end}}
+            </select>
+        </div>
+        <div>
+            <label for="blogimage" class="block text-lg font-semibold text-gray-800">Blog Image</label>
+            <input type="file"
+                   name="blogimage"
+                   id="blogimage"
+                   accept="image/*"
+                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+        </div>
+        <div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out">Post Blog</button>
+        </div>
+    </form>
+
+    <script>
+        function OnValidate(){
+            let blogTitle = document.getElementById("blogtitle")
+            let blogContent = document.getElementById("blogcontent")
+            let tags = document.getElementById("tags")
+
+            if (blogTitle == ""){
+                blogTitle.focus();
+                return false
+            }
+        }
+    </script>
+
+</div>
+
