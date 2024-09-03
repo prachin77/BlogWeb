@@ -1,9 +1,12 @@
 package utils
 
 import (
+	"bytes"
 	"crypto/rand"
 	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -22,32 +25,30 @@ func TokenGenerator() string {
 	return fmt.Sprintf("%x", b)
 }
 
-
 func CreateJwtToken(loggedInUserValue *models.User) (string, error) {
-    fmt.Println("Creating token for User:", loggedInUserValue)
-    fmt.Println("username in jwt token = ", loggedInUserValue.UserName)
-    fmt.Println("user id in jwt token = ", loggedInUserValue.UserId)
-    token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-        jwt.MapClaims{
-            "userid":   loggedInUserValue.UserId,
-            "username": loggedInUserValue.UserName,
-            "exp":      time.Now().Add(time.Hour * 24).Unix(),
-        })
+	fmt.Println("Creating token for User:", loggedInUserValue)
+	fmt.Println("username in jwt token = ", loggedInUserValue.UserName)
+	fmt.Println("user id in jwt token = ", loggedInUserValue.UserId)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"userid":   loggedInUserValue.UserId,
+			"username": loggedInUserValue.UserName,
+			"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		})
 
-    tokenString, err := token.SignedString(secretKey)
-    if err != nil {
-        fmt.Println(err)
-        return "", err
-    }
-    fmt.Println("JWT token string : ", tokenString)
+	tokenString, err := token.SignedString(secretKey)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	fmt.Println("JWT token string : ", tokenString)
 
-    return tokenString, err
+	return tokenString, err
 }
 
-
 func SetCookie(ctx *gin.Context, loggedInUserValue *models.User) {
-	tokenString , err := CreateJwtToken(loggedInUserValue)
-	if err!=nil{
+	tokenString, err := CreateJwtToken(loggedInUserValue)
+	if err != nil {
 		fmt.Println("failed to generate token")
 		return
 	}
@@ -74,7 +75,7 @@ func GetCookie(ctx *gin.Context) (string, string) {
 	}
 
 	tokenString := cookie.Value
-	fmt.Println("token string from getcookie func = ",tokenString)
+	fmt.Println("token string from getcookie func = ", tokenString)
 
 	// Decode JWT token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -104,11 +105,55 @@ func GetCookie(ctx *gin.Context) (string, string) {
 	}
 }
 
-func DeleteCookie(ctx *gin.Context){
+func DeleteCookie(ctx *gin.Context) {
 	cookie := &http.Cookie{
-		Name : "SessionToken",
-		Value: "",
+		Name:   "SessionToken",
+		Value:  "",
 		MaxAge: -1,
 	}
-	http.SetCookie(ctx.Writer,cookie)
+	http.SetCookie(ctx.Writer, cookie)
+}
+
+// FileHeaderToBytes converts a *multipart.FileHeader to a byte slice.
+func FileHeaderToBytes(fileHeader *multipart.FileHeader) ([]byte, error) {
+	// Open the uploaded file
+	file, err := fileHeader.Open()
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	// Read the file content into a buffer
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, file); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func GetCurrentDate(ctx *gin.Context) string {
+	// now := time.Now()
+	// fmt.Printf("Current date and time: %s\n", now.Format("2006-01-02 15:04:05"))
+
+	now := time.Now()
+
+	fmt.Println("Current date and time:", now)
+
+	year := now.Year()
+	month := now.Month()
+	day := now.Day()
+	hour := now.Hour()
+	minute := now.Minute()
+	second := now.Second()
+
+	fmt.Println("Year:", year)
+	fmt.Println("Month:", month)
+	fmt.Println("Day:", day)
+	fmt.Println("Hour:", hour)
+	fmt.Println("Minute:", minute)
+	fmt.Println("Second:", second)
+
+	date := fmt.Sprintf("%02d-%02d-%04d", now.Day(), now.Month(), now.Year())
+	return date
 }

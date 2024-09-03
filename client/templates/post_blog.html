@@ -1,21 +1,19 @@
-<div id="post-blog-div" class="p-6 bg-white rounded-lg shadow-lg max-w-3xl mx-auto mt-8">
+<div id="post-blog-div" class="p-6 bg-white rounded-lg shadow-lg max-w` mx-auto mt-8">
     <script src="https://unpkg.com/htmx.org@1.9.11"
         integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
         crossorigin="anonymous">
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
-    <!-- ckeditor cdn - for fancy text editor  -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-    
-    <form id="post-blog-form" 
+
+    <form id="post-blog-form"
           hx-post="/post-blog"
+          hx-push-url="/blogger"
           class="space-y-6"
-          hx-ext="json-enc"
-          enctype="multipart/form-data"
           hx-target="#post-blog-div"
           hx-swap="outerHTML"
           hx-trigger="submit"
+          enctype="multipart/form-data"
     >
         <div>
             <label for="blogtitle" class="block text-lg font-semibold text-gray-800">Blog Title</label>
@@ -32,13 +30,8 @@
                       id="blogcontent"
                       class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
                       rows="6"
-                      placeholder="Enter content"
-            >
+                      placeholder="Enter content">
             </textarea>
-            <!-- Replace editor1 with name attribute of your textarea tag -->
-            <script>
-                CKEDITOR.replace('blogcontent');
-            </script>
         </div>
         <div>
             <label for="tags" class="block text-lg font-semibold text-gray-800">Tags</label>
@@ -53,7 +46,6 @@
             <input type="file"
                    name="blogimage"
                    id="blogimage"
-                   accept="image/*"
                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
         </div>
         <div>
@@ -69,7 +61,7 @@
     <script>
         function OnValidate(event){
             let blogTitle = document.getElementById("blogtitle");
-            let blogContent = CKEDITOR.instances.blogcontent.getData(); // Use CKEDITOR to get content
+            let blogContent = document.getElementById("blogcontent").value;
             let tags = document.getElementById("tags");
     
             if (blogTitle.value.trim() === ""){
@@ -87,14 +79,14 @@
             
             if (blogContent.trim() === ""){
                 alert("Blog content can't be empty");
-                document.querySelector('#blogcontent').focus(); // CKEditor focus
+                document.getElementById("blogcontent").focus();
                 event.preventDefault(); 
                 return false;
             }
-            // Assuming you want to check content length
+            // Check content length
             if(blogContent.length < 1 || blogContent.length > 100){
-                alert("Minimum 1 letter & max 100 letters");
-                document.querySelector('#blogcontent').focus(); // CKEditor focus
+                alert("Content must be between 1 and 100 characters");
+                document.getElementById("blogcontent").focus();
                 event.preventDefault();
                 return false;
             }
@@ -131,7 +123,4 @@
             OnValidate(event);
         });
     </script>
-    
-
 </div>
-
