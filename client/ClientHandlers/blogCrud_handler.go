@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prachin77/db"
 	"github.com/prachin77/server/models"
 	"github.com/prachin77/server/utils"
 )
@@ -26,7 +27,7 @@ func PostBlog(ctx *gin.Context) {
 
 	blog.BlogTitle = ctx.Request.PostFormValue("blogtitle")
 	blog.BlogContent = ctx.Request.PostFormValue("blogcontent")
-	blog.Tags = ctx.Request.Form["tags"]
+	blog.Tags = ctx.Request.PostFormValue("tags")
 	fmt.Println("blog content = ", blog.BlogContent)
 
 	file, header, err := ctx.Request.FormFile("blogimage")
@@ -74,6 +75,13 @@ func PostBlog(ctx *gin.Context) {
 		return
 	}
 	blog.UserId = userid
+	userDetails, err := db.SearchUserWithId(blog.UserId)
+	if err != nil {
+		fmt.Println("error in finding user = ", err)
+		return
+	}
+	fmt.Println("user details = ", userDetails)
+	blog.AuthorName = userDetails.UserName
 
 	blog.BlogCreationDate = utils.GetCurrentDate(ctx)
 
@@ -81,6 +89,8 @@ func PostBlog(ctx *gin.Context) {
 		"BlogTitle":           blog.BlogTitle,
 		"BlogContent":         blog.BlogContent,
 		"BlogTags":            blog.Tags,
+		"AuthorName":          blog.AuthorName,
+		"ImageDataInBytes":    imageData,
 		"BlogImageDataLength": len(imageData),
 		"UserId":              blog.UserId,
 		"BlogId":              blog.BlogId,
@@ -93,10 +103,10 @@ func PostBlog(ctx *gin.Context) {
 		return
 	}
 
+	db.AddBlog(respInterface, &blog)
+
 	fmt.Println("Blog details:")
 	fmt.Println(string(jsonData))
-
-	
 
 	RenderHomePage(ctx, userid)
 }

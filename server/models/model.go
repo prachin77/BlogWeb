@@ -9,24 +9,25 @@ type User struct {
 
 // for client side authentication frontend
 type AuthPageStatus struct {
-    IsLogin bool
+	IsLogin bool
 }
 
-
-// for blogs 
+// for blogs
 type Blog struct {
-	UserId string `json:"userid"`
-	BlogId string `json:"blogid"`
+	UserId           string `json:"userid"`
+	BlogId           string `json:"blogid"`
+	AuthorName       string `json:"authorname"`
 	BlogCreationDate string `json:"blog_creation_date"`
-	BlogTitle string `json:"blogtitle"`
-	BlogContent string `json:"blogcontent"`
-	BlogImage string `json:"blogimage"`
-	Tags []string `json:"tags"`
-	Views int `json:"views"`
-	Likes int `json:"likes"`
-	Comments string `json:"comments"`
+	BlogTitle        string `json:"blogtitle"`
+	BlogContent      string `json:"blogcontent"`
+	BlogImage        string `json:"blogimage"`
+	Tags             string `json:"tags"`
+	Views            int    `json:"views"`
+	Likes            int    `json:"likes"`
+	Comments         string `json:"comments"`
 }
-// Blog storing format in mongo db 
+
+// Blog storing format in mongo db
 // userid : {
 // 	// user id & than all the blogs that user has created in list format
 // 	[
@@ -51,9 +52,9 @@ type Blog struct {
 // 			views:"",
 // 			likes:"",
 // 			comments:""
-// 		}, 
+// 		},
 // 		........ other blogs
 // 	]
 // }
 
-
+// NORMAL FORMAT -> insert as it is

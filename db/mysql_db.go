@@ -78,7 +78,7 @@ func IsTokenPresentInDb(tokenString string) (bool, error) {
     return count > 0, nil
 }
 
-func SearchUserWithId(userid string) (models.User,error) {
+func SearchUserWithId(userid string) (models.User , error) {
 	query := "SELECT * FROM users WHERE userid = ?"
 
 	row := db.QueryRow(query, userid)

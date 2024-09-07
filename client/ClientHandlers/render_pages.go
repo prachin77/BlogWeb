@@ -56,7 +56,7 @@ func RenderHomePage(ctx *gin.Context, userid string) {
 		ctx.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	tmpl.Execute(ctx.Writer, userDetails)
+	tmpl.Execute(ctx.Writer, userid)
 }
 
 func RenderLoginPage(ctx *gin.Context) {
@@ -82,8 +82,8 @@ func RenderRegisterPage(ctx *gin.Context) {
 	tmpl.Execute(ctx.Writer, authStatus)
 }
 
-func RenderPostBlogPage(ctx *gin.Context){
-	ctx.Header("content-Type" , "text/html")
+func RenderPostBlogPage(ctx *gin.Context) {
+	ctx.Header("content-Type", "text/html")
 
 	tagsList := []string{
 		"Science",
@@ -101,10 +101,9 @@ func RenderPostBlogPage(ctx *gin.Context){
 		"Mythology",
 	}
 	data := map[string]interface{}{
-		"TagsList" : tagsList,
+		"TagsList": tagsList,
 	}
 
 	tmpl := template.Must(template.ParseFiles(PATH + "post_blog.html"))
-	tmpl.Execute(ctx.Writer,data)
+	tmpl.Execute(ctx.Writer, data)
 }
-

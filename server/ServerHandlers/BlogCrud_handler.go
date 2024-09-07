@@ -1,0 +1,5 @@
+package serverhandlers
+
+func PostBlog(){
+	
+}
