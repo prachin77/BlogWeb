@@ -23,6 +23,8 @@ func main() {
 	r.POST("/register", serverhandlers.Register)
 	r.POST("/login",serverhandlers.Login)
 
+	// BLOG URLs 
+
 	// start server
 	err := r.Run(":8080")
 	if err != nil {

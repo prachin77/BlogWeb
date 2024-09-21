@@ -14,17 +14,17 @@ type AuthPageStatus struct {
 
 // for blogs
 type Blog struct {
-	UserId           string `json:"userid"`
-	BlogId           string `json:"blogid"`
-	AuthorName       string `json:"authorname"`
-	BlogCreationDate string `json:"blog_creation_date"`
-	BlogTitle        string `json:"blogtitle"`
-	BlogContent      string `json:"blogcontent"`
-	BlogImage        string `json:"blogimage"`
-	Tags             string `json:"tags"`
-	Views            int    `json:"views"`
-	Likes            int    `json:"likes"`
-	Comments         string `json:"comments"`
+	UserId           string `bson:"userid" json:"userid"`
+	BlogId           string `bson:"blogid" json:"blogid"`
+	AuthorName       string `bson:"authorname" json:"authorname"`
+	BlogCreationDate string `bson:"blog_creation_date" json:"blog_creation_date"`
+	BlogTitle        string `bson:"blogtitle" json:"blogtitle"`
+	BlogContent      string `bson:"blogcontent" json:"blogcontent"`
+	BlogImage        []byte `bson:"blogimage" json:"blogimage"`
+	Tags             string `bson:"tags" json:"tags"`
+	Views            int    `bson:"views" json:"views"`
+	Likes            int    `bson:"likes" json:"likes"`
+	Comments         string `bson:"comments" json:"comments"`
 }
 
 // Blog storing format in mongo db

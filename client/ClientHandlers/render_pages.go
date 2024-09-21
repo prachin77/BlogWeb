@@ -48,7 +48,15 @@ func RenderHomePage(ctx *gin.Context, userid string) {
 		ctx.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	fmt.Println("user details from render home page = ", userDetails)
+
+	respInterface = map[string]interface{}{
+		"userDetails":map[string]interface{}{
+			"username" : userDetails.UserName,
+			"useremail" : userDetails.Email, 
+		},
+	}
+
+	fmt.Println(respInterface)
 
 	tmpl, err := template.ParseFiles(PATH + "homepage.html")
 	if err != nil {
@@ -56,7 +64,7 @@ func RenderHomePage(ctx *gin.Context, userid string) {
 		ctx.String(http.StatusInternalServerError, "Internal Server Error")
 		return
 	}
-	tmpl.Execute(ctx.Writer, userid)
+	tmpl.Execute(ctx.Writer, respInterface)
 }
 
 func RenderLoginPage(ctx *gin.Context) {

@@ -1,12 +1,9 @@
 package utils
 
 import (
-	"bytes"
 	"crypto/rand"
 	"fmt"
-	"io"
 	"log"
-	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -112,24 +109,6 @@ func DeleteCookie(ctx *gin.Context) {
 		MaxAge: -1,
 	}
 	http.SetCookie(ctx.Writer, cookie)
-}
-
-// FileHeaderToBytes converts a *multipart.FileHeader to a byte slice.
-func FileHeaderToBytes(fileHeader *multipart.FileHeader) ([]byte, error) {
-	// Open the uploaded file
-	file, err := fileHeader.Open()
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	// Read the file content into a buffer
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, file); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
 }
 
 func GetCurrentDate(ctx *gin.Context) string {

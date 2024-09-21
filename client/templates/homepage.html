@@ -79,7 +79,7 @@
                              alt="User Profile"
                         >
                         <div class="ml-2 hidden sm:flex items-center">
-                            <p class="text-white text-sm">{{ .UserName }}</p>
+                            <p class="text-white text-xl">{{ .userDetails.username }}</p>
                         </div>
                     </button>
                     <button id="logout-button" 
@@ -99,9 +99,6 @@
     <!-- MAIN CONTENT -->
     <div id="main-content-div" class="flex-1 p-4 border-8 border-black">
 
-        {{ range . }}
-            {{ template "blog.html" }}
-        {{ end }}
 
         <!-- ADD BLOG BUTTON  -->
         <div class="absolute bottom-20 right-20 group">
