@@ -22,6 +22,7 @@ func main() {
 	// AUTH URLs 
 	r.POST("/register", serverhandlers.Register)
 	r.POST("/login",serverhandlers.Login)
+	r.DELETE("/logout",serverhandlers.Logout)
 
 	// BLOG URLs 
 

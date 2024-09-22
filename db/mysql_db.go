@@ -6,12 +6,15 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/prachin77/server/models"
+	"github.com/prachin77/server/utils"
 )
 
 var db *sql.DB
+var resp = make(map[string]string)
 
 func init() {
 	if err := godotenv.Load("P:/BlogWeb/.env"); err != nil {
@@ -35,7 +38,7 @@ func init() {
 }
 
 func CheckUserInDB(user *models.User) (bool, models.User) {
-	query := "SELECT * FROM users WHERE email = ? AND password = ?"
+	query := "SELECT username, email, password, COALESCE(userid, '') FROM users WHERE email = ? AND password = ?"
 
 	row := db.QueryRow(query, user.Email, user.Password)
 
@@ -44,16 +47,15 @@ func CheckUserInDB(user *models.User) (bool, models.User) {
 	err := row.Scan(&storedUser.UserName, &storedUser.Email, &storedUser.Password, &storedUser.UserId)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// User not found in the database
 			return false, models.User{}
 		}
 		log.Printf("Query execution error: %v", err)
 		return false, models.User{}
 	}
 
-	// User found in the database
 	return true, storedUser
 }
+
 
 func InsertUser(user *models.User) (error, models.User) {
 	fmt.Println("user details for insert user ")
@@ -69,29 +71,58 @@ func InsertUser(user *models.User) (error, models.User) {
 }
 
 func IsTokenPresentInDb(tokenString string) (bool, error) {
-    query := "SELECT COUNT(*) FROM users WHERE userid = ?"
-    var count int
-    err := db.QueryRow(query, tokenString).Scan(&count)
-    if err != nil {
-        return false, err
-    }
-    return count > 0, nil
+	query := "SELECT COUNT(*) FROM users WHERE userid = ?"
+	var count int
+	err := db.QueryRow(query, tokenString).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
 
-func SearchUserWithId(userid string) (models.User , error) {
-	query := "SELECT * FROM users WHERE userid = ?"
-
-	row := db.QueryRow(query, userid)
-
-	var storedUser models.User	
-
-	err := row.Scan(&storedUser.UserName , &storedUser.Email , &storedUser.Password , &storedUser.UserId)
-	if err != nil{
-		if err == sql.ErrNoRows{
-			return models.User{} , nil
-		}
-		return models.User{} ,  nil
+func CheckUserIdUsingEmail(ctx *gin.Context, user *models.User) error {
+	// If UserId is empty, generate a new one and assign it directly
+	if user.UserId == "" {
+		user.UserId = utils.TokenGenerator()
+		return updateUserIdInDB(ctx, user)
 	}
 
-	return storedUser , nil
+	tokenString := utils.TokenGenerator()
+
+	// Ensure the token is unique
+	for {
+		isTokenFound, err := IsTokenPresentInDb(tokenString)
+		if err != nil {
+			return err
+		}
+		if !isTokenFound {
+			break
+		}
+		tokenString = utils.TokenGenerator()
+	}
+
+	user.UserId = tokenString
+	return updateUserIdInDB(ctx, user)
+}
+
+func updateUserIdInDB(ctx *gin.Context, user *models.User) error {
+	insertQuery := "UPDATE users SET userid = ? WHERE email = ?"
+	_, err := db.Exec(insertQuery, user.UserId, user.Email)
+	if err != nil {
+		// Log the error if needed
+		return err
+	}
+	return nil
+}
+
+func DeleteUserSessionToken(userid string) error {
+	query := "UPDATE users SET userid = NULL WHERE userid = ?"
+
+	_, err := db.Exec(query, userid)
+	if err != nil {
+		log.Printf("Error deleting session token for user ID %s: %v", userid, err)
+		return err
+	}
+
+	return nil
 }
