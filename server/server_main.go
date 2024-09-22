@@ -25,6 +25,7 @@ func main() {
 	r.DELETE("/logout",serverhandlers.Logout)
 
 	// BLOG URLs 
+	r.POST("/post-blog",serverhandlers.PostBlog)
 
 	// start server
 	err := r.Run(":8080")

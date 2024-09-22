@@ -99,7 +99,6 @@ func Logout(ctx *gin.Context) {
 		return
 	}
 
-	// Call to delete the session token
 	if err := db.DeleteUserSessionToken(user.UserId); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error deleting session token"})
 		return

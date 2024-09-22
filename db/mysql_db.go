@@ -56,7 +56,6 @@ func CheckUserInDB(user *models.User) (bool, models.User) {
 	return true, storedUser
 }
 
-
 func InsertUser(user *models.User) (error, models.User) {
 	fmt.Println("user details for insert user ")
 	fmt.Println(user)
@@ -68,6 +67,24 @@ func InsertUser(user *models.User) (error, models.User) {
 	}
 
 	return nil, *user
+}
+
+func SearchUserWithId(userid string) (models.User, error) {
+    query := "SELECT username, email, password, userid FROM users WHERE userid = ?"
+
+    row := db.QueryRow(query, userid)
+
+    var user models.User
+    err := row.Scan(&user.UserName, &user.Email, &user.Password, &user.UserId)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            // User not found
+            return models.User{}, nil
+        }
+        return models.User{}, err
+    }
+
+    return user, nil
 }
 
 func IsTokenPresentInDb(tokenString string) (bool, error) {
@@ -109,7 +126,6 @@ func updateUserIdInDB(ctx *gin.Context, user *models.User) error {
 	insertQuery := "UPDATE users SET userid = ? WHERE email = ?"
 	_, err := db.Exec(insertQuery, user.UserId, user.Email)
 	if err != nil {
-		// Log the error if needed
 		return err
 	}
 	return nil

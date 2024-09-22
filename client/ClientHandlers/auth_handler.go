@@ -16,8 +16,53 @@ import (
 var resp = make(map[string]string)
 var respInterface = make(map[string]interface{})
 
-func Login(ctx *gin.Context) {
+func Register(ctx *gin.Context) {
+	ctx.Header("content-Type", "text/html")
 
+	var user models.User
+	err := json.NewDecoder(ctx.Request.Body).Decode(&user)
+	if err != nil {
+		fmt.Println("data not in correct format : ",err)
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if user.UserName == "" || user.Email == "" || user.Password == "" {
+		fmt.Println("any of the fields can't be empty")
+		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// check if user is present in db or not
+	userFound, existingUser := db.CheckUserInDB(&user)
+	if userFound {
+		resp["message"] = "user found in db !"
+		fmt.Println("existing user details : ",existingUser)
+		ctx.Writer.WriteHeader(http.StatusConflict)
+		return
+	}
+
+	if err := db.CheckUserIdUsingEmail(ctx, &user); err != nil {
+		fmt.Println("error updating session token (userid)")
+		return
+	}
+
+
+	err, insertedUser := db.InsertUser(&user)
+	if err != nil {
+		fmt.Println("error inserting data")
+		ctx.Writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	utils.SetCookie(ctx, &insertedUser)
+	fmt.Println("Registration successful")
+	fmt.Println("Inserted user details: ", insertedUser)
+	ctx.Writer.WriteHeader(http.StatusOK)
+	RenderHomePage(ctx,user.UserId)
+}
+
+func Login(ctx *gin.Context) {
 	ctx.Header("content-Type", "text/html")
 
 	var user models.User
@@ -28,19 +73,25 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	// check for empty data
 	if user.Email == "" || user.Password == "" {
 		fmt.Println("email & password can't be empty")
 		ctx.Writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// check through email & pasword if user found  in db or not
 	userFound, storedUser := db.CheckUserInDB(&user)
 	if !userFound {
 		fmt.Println("message no user found in db")
-		ctx.Writer.WriteHeader(http.StatusBadRequest)
+		ctx.Writer.WriteHeader(http.StatusUnauthorized)
 		return
+	}
+
+	if storedUser.UserId == "" {
+		// Generate a new session token if UserId is empty
+		if err := db.CheckUserIdUsingEmail(ctx, &storedUser); err != nil {
+			fmt.Println("error updating session token (userid)")
+			return
+		}
 	}
 
 	utils.SetCookie(ctx, &storedUser)
@@ -57,63 +108,35 @@ func Login(ctx *gin.Context) {
 	RenderHomePage(ctx,user.UserId)
 }
 
-func Register(ctx *gin.Context) {
-	ctx.Header("content-Type", "text/html")
-
-	var user models.User
-	err := json.NewDecoder(ctx.Request.Body).Decode(&user)
-	if err != nil {
-		fmt.Println(err)
-		ctx.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if user.UserName == "" || user.Email == "" || user.Password == "" {
-		fmt.Println("any of the fields can't be empty")
-		ctx.Writer.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// check if user is present in db or not
-	userFound, _ := db.CheckUserInDB(&user)
-	if userFound == true {
-		resp["message"] = "user found in db !"
-		ctx.Writer.WriteHeader(http.StatusConflict)
-		return
-	}
-
-	tokenString := utils.TokenGenerator()
-	// Checking whether the generated session token is already used or not
-	// If so then generate another session token & keep this loop until we find a unique session token
-	for {
-		isTokenFound, err := db.IsTokenPresentInDb(tokenString)
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println("can't validate token")
-		}
-		if !isTokenFound {
-			break
-		}
-		tokenString = utils.TokenGenerator()
-		fmt.Println("new session token : ", tokenString)
-	}
-	user.UserId = tokenString
-
-	err, insertedUser := db.InsertUser(&user)
-	if err != nil {
-		fmt.Println("error inserting data")
-		ctx.Writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	utils.SetCookie(ctx, &insertedUser)
-	fmt.Println("Registration successful")
-	fmt.Println("Inserted user details: ", insertedUser)
-	ctx.Writer.WriteHeader(http.StatusOK)
-	RenderHomePage(ctx,user.UserId)
-}
-
 func Logout(ctx *gin.Context){
 	ctx.Header("content-Type","text/html")
+
+	
+	userid, tokenString := utils.GetCookie(ctx)
+	if tokenString == "" {
+		fmt.Println("cookie is null")
+		RenderLoginPage(ctx)
+		return
+	}
+	fmt.Println("cookie token string from logout = ", tokenString)
+	fmt.Println("userid from cookie from logout = ", userid)
+
+	// Check if the user ID exists in the database
+	userExists, err := db.IsTokenPresentInDb(userid)
+	if err != nil {
+		fmt.Println("error checking session token")
+		return
+	}
+
+	if !userExists {
+		fmt.Println("invalid session token")
+		return
+	}
+
+	if err := db.DeleteUserSessionToken(userid); err != nil {
+		fmt.Println("error deleting session token")
+		return
+	}
 
 	utils.DeleteCookie(ctx)
 	time.Sleep(5 * time.Second)
