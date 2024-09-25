@@ -1,10 +1,11 @@
 package models
 
+import "database/sql"
+
 type User struct {
-	UserName string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	UserId   string `json:"userid"`
+	UserName     string         `json:"username"`
+	Password     string         `json:"password"`
+	SessionToken sql.NullString `json:"session_token"`
 }
 
 // for client side authentication frontend
@@ -21,7 +22,7 @@ type Blog struct {
 	BlogTitle        string `bson:"blogtitle" json:"blogtitle"`
 	BlogContent      string `bson:"blogcontent" json:"blogcontent"`
 	BlogImage        []byte `bson:"blogimage" json:"blogimage"`
-	Tags             string `bson:"tags" json:"tags"`
+	Tag              string `bson:"tag" json:"tag"`
 	Views            int    `bson:"views" json:"views"`
 	Likes            int    `bson:"likes" json:"likes"`
 	Comments         string `bson:"comments" json:"comments"`

@@ -6,11 +6,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/prachin77/server/models"
-	"github.com/prachin77/server/utils"
 )
 
 var db *sql.DB
@@ -38,13 +36,13 @@ func init() {
 }
 
 func CheckUserInDB(user *models.User) (bool, models.User) {
-	query := "SELECT username, email, password, COALESCE(userid, '') FROM users WHERE email = ? AND password = ?"
+	query := "SELECT username, password, session_token FROM users WHERE username = ?"
 
-	row := db.QueryRow(query, user.Email, user.Password)
+	row := db.QueryRow(query, user.UserName)
 
 	var storedUser models.User
 
-	err := row.Scan(&storedUser.UserName, &storedUser.Email, &storedUser.Password, &storedUser.UserId)
+	err := row.Scan(&storedUser.UserName, &storedUser.Password, &storedUser.SessionToken)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return false, models.User{}
@@ -56,11 +54,10 @@ func CheckUserInDB(user *models.User) (bool, models.User) {
 	return true, storedUser
 }
 
+
 func InsertUser(user *models.User) (error, models.User) {
-	fmt.Println("user details for insert user ")
-	fmt.Println(user)
-	query := "INSERT INTO users (username, password, email, userid ) VALUES (?, ?, ?, ?)"
-	_, err := db.Exec(query, user.UserName, user.Password, user.Email, user.UserId)
+	query := "INSERT INTO users (username, password, session_token) VALUES (?, ?, ?)"
+	_, err := db.Exec(query, user.UserName, user.Password, user.SessionToken.String)
 	if err != nil {
 		log.Printf("Error inserting user into database: %v", err)
 		return err, models.User{}
@@ -69,26 +66,9 @@ func InsertUser(user *models.User) (error, models.User) {
 	return nil, *user
 }
 
-func SearchUserWithId(userid string) (models.User, error) {
-    query := "SELECT username, email, password, userid FROM users WHERE userid = ?"
-
-    row := db.QueryRow(query, userid)
-
-    var user models.User
-    err := row.Scan(&user.UserName, &user.Email, &user.Password, &user.UserId)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            // User not found
-            return models.User{}, nil
-        }
-        return models.User{}, err
-    }
-
-    return user, nil
-}
 
 func IsTokenPresentInDb(tokenString string) (bool, error) {
-	query := "SELECT COUNT(*) FROM users WHERE userid = ?"
+	query := "SELECT COUNT(*) FROM users WHERE session_token = ?"
 	var count int
 	err := db.QueryRow(query, tokenString).Scan(&count)
 	if err != nil {
@@ -97,47 +77,31 @@ func IsTokenPresentInDb(tokenString string) (bool, error) {
 	return count > 0, nil
 }
 
-func CheckUserIdUsingEmail(ctx *gin.Context, user *models.User) error {
-	// If UserId is empty, generate a new one and assign it directly
-	if user.UserId == "" {
-		user.UserId = utils.TokenGenerator()
-		return updateUserIdInDB(ctx, user)
-	}
+func DeleteSessionToken(sessionToken string) error {
+    query := "update users set session_token = NULL where session_token = ?"
 
-	tokenString := utils.TokenGenerator()
+    _, err := db.Exec(query, sessionToken)
+    if err != nil {
+        return err
+    }
 
-	// Ensure the token is unique
-	for {
-		isTokenFound, err := IsTokenPresentInDb(tokenString)
-		if err != nil {
-			return err
-		}
-		if !isTokenFound {
-			break
-		}
-		tokenString = utils.TokenGenerator()
-	}
-
-	user.UserId = tokenString
-	return updateUserIdInDB(ctx, user)
+    return nil
 }
 
-func updateUserIdInDB(ctx *gin.Context, user *models.User) error {
-	insertQuery := "UPDATE users SET userid = ? WHERE email = ?"
-	_, err := db.Exec(insertQuery, user.UserId, user.Email)
+func UpdateSessionToken(username string, sessionToken string) error {
+	query := "UPDATE users SET session_token = ? WHERE username = ?"
+
+	result, err := db.Exec(query, sessionToken, username)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to execute update: %w", err)
 	}
-	return nil
-}
 
-func DeleteUserSessionToken(userid string) error {
-	query := "UPDATE users SET userid = NULL WHERE userid = ?"
-
-	_, err := db.Exec(query, userid)
+	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		log.Printf("Error deleting session token for user ID %s: %v", userid, err)
-		return err
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("no user found with username: %s", username)
 	}
 
 	return nil

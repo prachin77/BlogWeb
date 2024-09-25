@@ -25,10 +25,8 @@ func TokenGenerator() string {
 func CreateJwtToken(loggedInUserValue *models.User) (string, error) {
 	fmt.Println("Creating token for User:", loggedInUserValue)
 	fmt.Println("username in jwt token = ", loggedInUserValue.UserName)
-	fmt.Println("user id in jwt token = ", loggedInUserValue.UserId)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"userid":   loggedInUserValue.UserId,
 			"username": loggedInUserValue.UserName,
 			"exp":      time.Now().Add(time.Hour * 24).Unix(),
 		})

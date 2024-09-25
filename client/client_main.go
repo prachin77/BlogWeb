@@ -21,7 +21,7 @@ func main() {
 
 	// Serve static files from the "static" directory
 	// r.Static("/static", "P:/BlogWeb/client/static/images")
-	r.Static("/static", "./static") 
+	r.Static("/static", "./static")
 
 	r.GET("/", clienthandlers.DefaultRoute)
 	r.GET("/blogger", clienthandlers.RenderInitPage)
@@ -31,9 +31,11 @@ func main() {
 	r.GET("/login", clienthandlers.RenderLoginPage)
 	r.POST("/login", clienthandlers.Login)
 	r.POST("/register", clienthandlers.Register)
-	r.DELETE("/logout",clienthandlers.Logout)
+	r.DELETE("/logout", clienthandlers.Logout)
 
-	// BLOG URLs 
+	// BLOG URLs
+	r.GET("/post-blog", clienthandlers.RenderPostBlogPage)
+	r.POST("/post-blog",clienthandlers.PostBlog)
 
 	// start server
 	err := r.Run(":1234")
@@ -41,4 +43,3 @@ func main() {
 		fmt.Println(err)
 	}
 }
-

@@ -1,10 +1,13 @@
-<div id="post-blog-div" class="p-6 bg-white rounded-lg shadow-lg max-w mx-auto mt-8">
-    <script src="https://unpkg.com/htmx.org@1.9.11"
-        integrity="sha384-0gxUXCCR8yv9FM2b+U3FDbsKthCI66oH5IA9fHppQq9DDMHuMauqq1ZHBpJxQ0J0"
-        crossorigin="anonymous">
-    </script>
+<div id="post-blog-div" class="p-6 bg-white rounded-lg shadow-2xl width-full mx-auto mt-8 h-auto overflow-y-auto">
+
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/json-enc.js"></script>
+
+    <a href="/blogger" class="inline-block mb-4 text-blue-600 hover:underline">
+        <img src="/static/images/back.png" alt="Back" class="w-6 h-6 inline-block mr-1"> 
+    </a>
+
+    <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">Create a New Blog Post</h2>
 
     <form id="post-blog-form"
           hx-post="/post-blog"
@@ -16,44 +19,41 @@
           enctype="multipart/form-data"
     >
         <div>
-            <label for="blogtitle" class="block text-lg font-semibold text-gray-800">Blog Title</label>
+            <label for="blogtitle" class="block text-lg font-semibold text-gray-900">Blog Title</label>
             <input type="text"
                    name="blogtitle"
                    id="blogtitle"
-                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition duration-150 ease-in-out"
                    autocomplete="off"
                    placeholder="Enter title">
         </div>
         <div>
-            <label for="blogcontent" class="block text-lg font-semibold text-gray-800">Blog Content</label>
+            <label for="blogcontent" class="block text-lg font-semibold text-gray-900">Blog Content</label>
             <textarea name="blogcontent"
-                    id="blogcontent"
-                    class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                    rows="6"
-                    style="height: 150px;"
-            >
-            </textarea>
+                      id="blogcontent"
+                      class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition duration-150 ease-in-out"
+                      rows="6"
+                      placeholder="Write your blog content here..."></textarea>
         </div>
         <div>
-            <label for="tags" class="block text-lg font-semibold text-gray-800">Tags</label>
-            <select name="tags" id="tags" multiple class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+            <label for="tag" class="block text-lg font-semibold text-gray-900">Tags</label>
+            <select name="tag" id="tag" multiple class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition duration-150 ease-in-out">
                 {{range .TagsList}}
                 <option value="{{.}}">{{.}}</option>
                 {{end}}
             </select>
         </div>
         <div>
-            <label for="blogimage" class="block text-lg font-semibold text-gray-800">Blog Image</label>
+            <label for="blogimage" class="block text-lg font-semibold text-gray-900">Blog Image</label>
             <input type="file"
                    name="blogimage"
                    id="blogimage"
-                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                   class="mt-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition duration-150 ease-in-out">
         </div>
         <div>
             <button type="submit"
-                    id="post-button" 
-                    class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-            >
+                    id="post-button"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out w-full">
                 Post Blog
             </button>
         </div>
@@ -63,65 +63,59 @@
         function OnValidate(event){
             let blogTitle = document.getElementById("blogtitle");
             let blogContent = document.getElementById("blogcontent").value;
-            let tags = document.getElementById("tags");
-    
+
             if (blogTitle.value.trim() === ""){
                 alert("Blog title can't be empty");
                 blogTitle.focus();
-                // event.preventDefault(); 
                 return false;
             }
             if(blogTitle.value.length < 4 || blogTitle.value.length > 20){
                 alert("Title length should be between 4 to 20 characters");
                 blogTitle.focus();
-                // event.preventDefault(); 
                 return false;
             }
             
             if (blogContent.trim() === ""){
                 alert("Blog content can't be empty");
                 document.getElementById("blogcontent").focus();
-                // event.preventDefault(); 
                 return false;
             }
-            // Check content length
             if(blogContent.length < 1 || blogContent.length > 100){
                 alert("Content must be between 1 and 100 characters");
                 document.getElementById("blogcontent").focus();
-                // event.preventDefault();
                 return false;
             }
-    
+
             let blogImage = document.getElementById("blogimage");
-    
+
             if (blogImage.files.length === 0){
                 alert("Please select an image 😒");
-                // event.preventDefault();
                 return false;
             }
-    
+
             const maxImageSize = 2 * 1024 * 1024; // 2 MB
             if(blogImage.files[0].size > maxImageSize){
                 alert("File size exceeds 2MB");
-                // event.preventDefault(); 
                 return false;
             }
-    
+
             const validImageTypes = ["image/jpeg", "image/png", "image/jpg"];
             if(!validImageTypes.includes(blogImage.files[0].type)){
                 alert("Invalid file type");
-                // event.preventDefault(); 
                 return false;
             }
-    
+
             let postButton = document.getElementById("post-button");
-            postButton.innerText = "Posting ..."; // Update button text
+            postButton.innerText = "Posting ...";   
+            postButton.setAttribute("disabled","true");
+            postButton.classList.remove("cursor-pointer")
+            postButton.classList.add("cursor-not-allowed")
             return true;
         }
-    
+
         // Attach the OnValidate function to form submit
         document.getElementById('post-blog-form').addEventListener('submit', function(event) {
-            OnValidate(event);
+            return OnValidate(event);
         });
     </script>
 </div>

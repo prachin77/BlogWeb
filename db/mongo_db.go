@@ -38,3 +38,4 @@ func init() {
 	// collection instance
 	fmt.Println("collection instance is ready")
 }
+

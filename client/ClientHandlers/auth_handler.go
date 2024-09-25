@@ -33,7 +33,6 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
-	// check if user is present in db or not
 	userFound, existingUser := db.CheckUserInDB(&user)
 	if userFound {
 		resp["message"] = "user found in db !"
@@ -58,8 +57,8 @@ func Register(ctx *gin.Context) {
 	utils.SetCookie(ctx, &insertedUser)
 	fmt.Println("Registration successful")
 	fmt.Println("Inserted user details: ", insertedUser)
-	ctx.Writer.WriteHeader(http.StatusOK)
 	RenderHomePage(ctx,user.UserId)
+	ctx.Writer.WriteHeader(http.StatusOK)
 }
 
 func Login(ctx *gin.Context) {
@@ -104,8 +103,8 @@ func Login(ctx *gin.Context) {
 		"user":    storedUser,
 	}
 	fmt.Println(respInterface)
-	ctx.Writer.WriteHeader(http.StatusOK)
 	RenderHomePage(ctx,user.UserId)
+	ctx.Writer.WriteHeader(http.StatusOK)
 }
 
 func Logout(ctx *gin.Context){
@@ -140,6 +139,6 @@ func Logout(ctx *gin.Context){
 
 	utils.DeleteCookie(ctx)
 	time.Sleep(5 * time.Second)
-	RenderLoginPage(ctx)
 	ctx.Writer.WriteHeader(http.StatusOK)
+	RenderLoginPage(ctx)
 }
