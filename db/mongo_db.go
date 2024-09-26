@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/prachin77/server/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -39,3 +41,20 @@ func init() {
 	fmt.Println("collection instance is ready")
 }
 
+func AddBlog(blog *models.Blog) (*models.Blog, error) {
+
+	_, err := collection.InsertOne(context.TODO(), bson.M{
+		"blog_title":         blog.BlogTitle,
+		"blog_tag":           blog.Tag,
+		"blog_content":       blog.BlogContent,
+		"author_name":        blog.AuthorName,
+		"blog_creation_date": blog.BlogCreationDate,
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Blog added successfully!")
+	return blog, nil 
+}

@@ -36,9 +36,9 @@ func init() {
 }
 
 func CheckUserInDB(user *models.User) (bool, models.User) {
-	query := "SELECT username, password, session_token FROM users WHERE username = ?"
+	query := "SELECT username, password, session_token FROM users WHERE username = ? ans password = ?"
 
-	row := db.QueryRow(query, user.UserName)
+	row := db.QueryRow(query, user.UserName , user.Password)
 
 	var storedUser models.User
 
@@ -54,7 +54,6 @@ func CheckUserInDB(user *models.User) (bool, models.User) {
 	return true, storedUser
 }
 
-
 func InsertUser(user *models.User) (error, models.User) {
 	query := "INSERT INTO users (username, password, session_token) VALUES (?, ?, ?)"
 	_, err := db.Exec(query, user.UserName, user.Password, user.SessionToken.String)
@@ -65,7 +64,6 @@ func InsertUser(user *models.User) (error, models.User) {
 
 	return nil, *user
 }
-
 
 func IsTokenPresentInDb(tokenString string) (bool, error) {
 	query := "SELECT COUNT(*) FROM users WHERE session_token = ?"

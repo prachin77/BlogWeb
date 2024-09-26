@@ -98,7 +98,6 @@ func Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "Login successful", "user": storedUser})
 }
 
-
 func Logout(ctx *gin.Context) {
 	ctx.Header("Content-Type", "application/json")
 
