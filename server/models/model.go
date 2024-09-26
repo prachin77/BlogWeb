@@ -15,12 +15,13 @@ type AuthPageStatus struct {
 
 // for blogs
 type Blog struct {
-	AuthorName       string `bson:"authorname" json:"authorname"`
-	BlogCreationDate string `bson:"blog_creation_date" json:"blog_creation_date"`
-	BlogTitle        string `bson:"blogtitle" json:"blogtitle"`
-	BlogContent      string `bson:"blogcontent" json:"blogcontent"`
-	Tag              string `bson:"tag" json:"tag"`
-	Views            int    `bson:"views" json:"views"`
-	Likes            int    `bson:"likes" json:"likes"`
-	Comments         string `bson:"comments" json:"comments"`
+    BlogTitle        string `bson:"blog_title" json:"blogTitle"`
+    BlogContent      string `bson:"blog_content" json:"blogContent"`
+    AuthorName       string `bson:"author_name" json:"authorname"`
+    BlogCreationDate string `bson:"blog_creation_date" json:"blog_creation_date"`
+    Tag              string `bson:"blog_tag" json:"tag"`
+    Views            int    `bson:"views" json:"views"`
+    Likes            int    `bson:"likes" json:"likes"`
+    Comments         string `bson:"comments" json:"comments"`
 }
+

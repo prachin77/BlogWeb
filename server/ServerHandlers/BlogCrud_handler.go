@@ -11,6 +11,19 @@ import (
 	"github.com/prachin77/server/utils"
 )
 
+func GetAllBlogs(ctx *gin.Context) {
+	ctx.Header("Content-Type", "application/json")
+
+	retrievedBlogs, err := db.RetrieveAllBlogs()
+	if err != nil {
+		fmt.Println("error retrieving all blogs:", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "error retrieving all blogs"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, retrievedBlogs)
+}
+
 func PostBlog(ctx *gin.Context) {
 	ctx.Header("content-Type", "application/json")
 
@@ -41,8 +54,8 @@ func PostBlog(ctx *gin.Context) {
 	if insertedBlog, err := db.AddBlog(&blog); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "failed to add blog"})
 		return
-	}  else {
-		fmt.Println("inserted blog : ",insertedBlog)
+	} else {
+		fmt.Println("inserted blog : ", insertedBlog)
 	}
 
 	respInterface := map[string]interface{}{

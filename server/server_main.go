@@ -26,6 +26,7 @@ func main() {
 
 	// BLOG URLs 
 	r.POST("/post-blog",serverhandlers.PostBlog)
+	r.GET("/get-blogs",serverhandlers.GetAllBlogs)
 
 	// start server
 	err := r.Run(":8080")

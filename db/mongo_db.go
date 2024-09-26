@@ -41,6 +41,34 @@ func init() {
 	fmt.Println("collection instance is ready")
 }
 
+func RetrieveAllBlogs() ([]models.Blog, error) {
+    cursor, err := collection.Find(context.TODO(), bson.D{})
+    if err != nil {
+        fmt.Println("error retrieving all documents:", err)
+        return nil, err
+    }
+    defer cursor.Close(context.TODO())
+
+    var blogs []models.Blog
+    for cursor.Next(context.TODO()) {
+        var blog models.Blog
+        if err := cursor.Decode(&blog); err != nil {
+            fmt.Println("cursor.Next() error:", err)
+            return nil, err
+        }
+        fmt.Printf("Fetched blog: %+v\n", blog)
+        blogs = append(blogs, blog)
+    }
+
+    if err := cursor.Err(); err != nil {
+        fmt.Println("cursor error:", err)
+        return nil, err
+    }
+
+    return blogs, nil
+}
+
+
 func AddBlog(blog *models.Blog) (*models.Blog, error) {
 
 	_, err := collection.InsertOne(context.TODO(), bson.M{
@@ -56,5 +84,5 @@ func AddBlog(blog *models.Blog) (*models.Blog, error) {
 	}
 
 	fmt.Println("Blog added successfully!")
-	return blog, nil 
+	return blog, nil
 }
