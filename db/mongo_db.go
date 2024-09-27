@@ -42,32 +42,44 @@ func init() {
 }
 
 func RetrieveAllBlogs() ([]models.Blog, error) {
-    cursor, err := collection.Find(context.TODO(), bson.D{})
-    if err != nil {
-        fmt.Println("error retrieving all documents:", err)
-        return nil, err
-    }
-    defer cursor.Close(context.TODO())
+	cursor, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		fmt.Println("error retrieving all documents:", err)
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
 
-    var blogs []models.Blog
-    for cursor.Next(context.TODO()) {
-        var blog models.Blog
-        if err := cursor.Decode(&blog); err != nil {
-            fmt.Println("cursor.Next() error:", err)
-            return nil, err
-        }
-        fmt.Printf("Fetched blog: %+v\n", blog)
-        blogs = append(blogs, blog)
-    }
+	var blogs []models.Blog
+	for cursor.Next(context.TODO()) {
+		var blog models.Blog
+		if err := cursor.Decode(&blog); err != nil {
+			fmt.Println("cursor.Next() error:", err)
+			return nil, err
+		}
+		fmt.Printf("Fetched blog: %+v\n", blog)
+		blogs = append(blogs, blog)
+	}
 
-    if err := cursor.Err(); err != nil {
-        fmt.Println("cursor error:", err)
-        return nil, err
-    }
+	if err := cursor.Err(); err != nil {
+		fmt.Println("cursor error:", err)
+		return nil, err
+	}
 
-    return blogs, nil
+	return blogs, nil
 }
 
+func SearchTitleOfBlog(blog *models.Blog) (*models.Blog, error) {
+
+	filter := bson.M{"blog_title": blog.BlogTitle}
+	err := collection.FindOne(context.TODO(), filter).Decode(&blog)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return blog, nil
+}
 
 func AddBlog(blog *models.Blog) (*models.Blog, error) {
 

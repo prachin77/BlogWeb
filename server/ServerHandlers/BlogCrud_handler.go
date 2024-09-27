@@ -51,6 +51,16 @@ func PostBlog(ctx *gin.Context) {
 
 	blog.BlogCreationDate = utils.GetCurrentDate(ctx)
 
+	foundBlog, err := db.SearchTitleOfBlog(&blog)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "An error occurred while searching for the blog"})
+		return
+	}
+	if foundBlog != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Blog with the same title found, please give a new title","found blog":foundBlog})
+		return
+	}
+
 	if insertedBlog, err := db.AddBlog(&blog); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "failed to add blog"})
 		return
