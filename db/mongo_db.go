@@ -42,6 +42,7 @@ func init() {
 }
 
 func RetrieveAllBlogs() ([]models.Blog, error) {
+	// RETURNS LISTS / SLICE OF BLOGS 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
 	if err != nil {
 		fmt.Println("error retrieving all documents:", err)
@@ -97,4 +98,5 @@ func AddBlog(blog *models.Blog) (*models.Blog, error) {
 
 	fmt.Println("Blog added successfully!")
 	return blog, nil
-}
+}	
+

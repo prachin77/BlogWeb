@@ -79,3 +79,38 @@ func PostBlog(ctx *gin.Context) {
 	fmt.Println("blog details : ", respInterface)
 	ctx.JSON(http.StatusOK, respInterface)
 }
+
+func GetBlogByTitle(ctx *gin.Context){
+	ctx.Header("Content-Type" , "application/json")
+
+	var blog models.Blog
+
+	if err := json.NewDecoder(ctx.Request.Body).Decode(&blog); err != nil{
+		ctx.JSON(http.StatusBadRequest , gin.H{"message" : "data not in correct format"})
+		return
+	}
+
+	if blog.BlogTitle == ""{
+		ctx.JSON(http.StatusBadRequest , gin.H{"message" : "blog is empty"})
+		return
+	}
+
+	foundBlog , err := db.SearchTitleOfBlog(&blog)
+	if err != nil{
+		ctx.JSON(http.StatusBadRequest , gin.H{"message":"error occured while searching blog"})
+		fmt.Println("error retriving blog : ",err)
+		return
+	}	 
+	fmt.Println("retrived blog : ",foundBlog)
+	respInterface := map[string]interface{}{
+		"blog title":         blog.BlogTitle,
+		"blog tag":           blog.Tag,
+		"blog content":       blog.BlogContent,
+		"Username":           blog.AuthorName,
+		"Blog creation date": blog.BlogCreationDate,
+	}
+
+	fmt.Println("blog details : ", respInterface)
+	ctx.JSON(http.StatusOK, respInterface)
+
+}
